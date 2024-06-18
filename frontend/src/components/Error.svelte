@@ -1,4 +1,5 @@
 <script>
+
     export let error  // 전달받은 오류
 </script>
 
