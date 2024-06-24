@@ -5,3 +5,6 @@ question, answer 도메인 board로 통합
 비밀번호 프론트에서 암호화해서 백으로 보내기
 
 sqllite에서 mariadb로 마이그레이션
+
+현재 게시물이 modify되지않아도 modify at이 나오는 현상
+    --> db에 modify boolean 컬럼 만들어서 필드 참조 할수 있도록 변경 

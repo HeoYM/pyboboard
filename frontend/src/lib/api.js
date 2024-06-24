@@ -31,7 +31,7 @@ const fastapi = (operation, url, params, success_callback, failure_callback) => 
         options.headers["Authorization"] = "Bearer " + _access_token
     }
 
-
+CDATASection.apply
 
     if (method !== 'get') {
         options['body'] = body
