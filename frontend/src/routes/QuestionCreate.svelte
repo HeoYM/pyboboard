@@ -40,8 +40,6 @@
             <label for="content">내용</label>
             <textarea class="form-control" rows="10" bind:value={content}></textarea>
         </div>
-        <button class="btn btn-primary" on:click={post_question}
-            >저장하기</button
-        >
+        <button class="btn btn-primary" on:click={post_question}>저장하기</button>
     </form>
 </div>

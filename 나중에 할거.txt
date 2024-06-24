@@ -1,0 +1,7 @@
+bootstrap tailwind로 마이그레이션
+css클래스 정리
+html 그리드시스템으로 교체
+question, answer 도메인 board로 통합
+비밀번호 프론트에서 암호화해서 백으로 보내기
+
+sqllite에서 mariadb로 마이그레이션
