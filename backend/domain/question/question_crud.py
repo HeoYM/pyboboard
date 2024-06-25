@@ -39,3 +39,8 @@ def update_question(db: Session, db_question: Question,
 
 def get_answer(db: Session, answer_id: int):
     return db.query(Answer).get(answer_id)
+
+
+def like_question(db: Session, db_question: Question, db_user: User):
+    db_question.userlike.append(db_user)
+    db.commit()

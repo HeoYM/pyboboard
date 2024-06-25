@@ -14,6 +14,7 @@ class Question(BaseModel):
     answers: list[Answer] = []
     user: User | None
     modify_date: datetime.datetime | None = None
+    userlike: list[User] = []
 
 class QuestionCreate(BaseModel):
     subject: str
@@ -31,4 +32,8 @@ class QuestionList(BaseModel):
 
 
 class QuestionUpdate(QuestionCreate):
+    question_id: int
+
+
+class QuestionLike(BaseModel):
     question_id: int

@@ -61,3 +61,14 @@ def answer_delete(_answer_delete: answer_schema.AnswerDelete,
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST,
                             detail="삭제 권한이 없습니다.")
     answer_crud.delete_answer(db=db, db_answer=db_answer)
+
+
+@router.post("/like", status_code=status.HTTP_204_NO_CONTENT)
+def answer_like(_answer_like: answer_schema.AnswerLike,
+                db: Session = Depends(get_db),
+                current_user: User = Depends(get_current_user)):
+    db_answer = answer_crud.get_answer(db, answer_id=_answer_like.answer_id)
+    if not db_answer:
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST,
+                            detail="데이터를 찾을수 없습니다.")
+    answer_crud.like_answer(db, db_answer=db_answer, db_user=current_user)

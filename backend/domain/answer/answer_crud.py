@@ -30,3 +30,8 @@ def update_answer(db: Session, db_answer: Answer,
 def delete_answer(db: Session, db_answer: Answer):
     db.delete(db_answer)
     db.commit()
+
+
+def like_answer(db: Session, db_answer: Answer, db_user: User):
+    db_answer.userlike.append(db_user)
+    db.commit()
