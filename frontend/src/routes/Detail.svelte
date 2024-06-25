@@ -8,7 +8,7 @@
 
     export let params = {};
     let question_id = params.question_id;
-    let question = { answers: [] };
+    let question = { answers: [], userlike:[] };
     let content = "";
     let error = { detail: [] };
 
@@ -57,6 +57,44 @@
             )
         }
     }
+
+
+    function like_question(_question_id) {
+        if(window.confirm('정말로 추천하시겠습니까?')) {
+            let url = "/api/question/like"
+            let params = {
+                question_id: _question_id
+            }
+            fastapi('post', url, params, 
+                (json) => {
+                    get_question()
+                },
+                (err_json) => {
+                    error = err_json
+                }
+            )
+        }
+    }
+
+    function like_answer(answer_id) {
+        if(window.confirm('정말로 추천하시겠습니까?')) {
+            let url = "/api/answer/like"
+            let params = {
+                answer_id: answer_id
+            }
+            fastapi('post', url, params, 
+                (json) => {
+                    get_question()
+                },
+                (err_json) => {
+                    error = err_json
+                }
+            )
+        }
+    }
+
+
+
 </script>
 
 <div class="container my-3">
@@ -68,31 +106,29 @@
         <div class="card my-3">
             <div class="card-body">
                 <div class="card-text" style="white-space: pre-line;">{question.content}</div>
-                <div class="d-flex flex-column align-items-end">
-                    
-                    {#if question.modify_date }
-                        <div class="badge bg-light text-dark p-2">
-                            <div class="mb-2">modified at</div>
-                            <div class="badge bg-light text-dark p-2 ml-auto">{question.user ? question.user.username : ""}</div>
-                            <div class="badge bg-light text-dark p-2 ">{moment(question.create_date).format("YY.MM.DD a hh:mm")}</div>
-                        </div>
-                    {:else}
-                        <div class="badge bg-light text-dark p-2">
-                            <div class="mb-2">modified at</div>
-                            <div class="badge bg-light text-dark p-2 ml-auto">{question.user ? question.user.username : ""}</div>
-                            <div class="badge bg-light text-dark p-2 ">{moment(question.create_date).format("YY.MM.DD a hh:mm")}</div>
-                        </div>
-                    {/if}
-
-
-
-                </div>
+                <div class="d-flex flex-column align-items-end"></div>
             </div>
-            {#if question.user && $username === question.user.username }
-            <a use:link href="/question-modify/{question.id}" 
-            class="btn btn-sm btn-outline-secondary position-absolute" style="top: 10px; right: 10px;">수정</a>
-            {/if}
-        </div>
+        
+            <div class="button mt-5">
+                <button class="btn btn-sm btn-outline-secondary mt-3 position-absolute" style="bottom: 10px; left: 10px;" on:click="{like_question(question.id)}">추천
+                    <span class="badge rounded-pill bg-success">{ question.userlike.length }</span>
+                </button>
+                
+                {#if question.user && $username === question.user.username }
+                    <a use:link href="/question-modify/{question.id}" class="btn btn-sm btn-outline-secondary position-absolute" style="bottom: 10px; left: 90px;">수정</a>
+                {/if}
+
+                {#if question.modify_date }
+                    <div class="position-absolute" style="bottom: 10px; right: 10px;">
+                        <div class="badge bg-light text-dark p-2 ">작성자: {question.user ? question.user.username : ""}</div>
+                        <div class="badge bg-light text-dark p-2 ">modified at {moment(question.create_date).format("YY.MM.DD a hh:mm")}</div>
+                    </div>
+                {/if}
+            </div>
+        
+        </div>    
+        
+        
     </div>    
     <!-- 그리드 2 -->
     
@@ -103,18 +139,24 @@
         <div class="card my-3">
             <div class="card-body position-relative">
                 <div class="card-text" style="white-space: pre-line;">{answer.content}</div>
-                <div class="d-flex flex-column align-items-end">
-                    <div class="badge bg-light text-dark p-2 ml-auto">{question.user ? question.user.username : ""}</div>
-                    <div class="badge bg-light text-dark p-2">{moment(question.create_date).format("YY.MM.DD a hh:mm")}</div>
+                
+                <div class="button mt-5"></div>
+                    <button class="btn btn-sm btn-outline-secondary mt-3 position-absolute" style="bottom: 10px; left: 10px;" on:click="{like_answer(answer.id)}">추천
+                        <span class="badge rounded-pill bg-success">{ answer.userlike.length }</span>
+                    </button>
+                    
+                    {#if answer.user && $username === answer.user.username }
+                        <a use:link href="/answer-modify/{answer.id}" class="btn btn-sm btn-outline-secondary mt-3 position-absolute" style="bottom: 10px; left: 90px;">수정</a>
+                        <button class="btn btn-sm btn-outline-secondary mt-3 position-absolute" style="bottom: 10px; left: 145px;" on:click={() => delete_answer(answer.id) }>삭제</button>
+                    {/if}
+
+                    <div class="position-absolute" style="bottom: 10px; right: 10px;">
+                        <div class="badge bg-light text-dark p-2">작성자: {question.user ? question.user.username : ""}</div>
+                        <div class="badge bg-light text-dark p-2">{moment(question.create_date).format("YY.MM.DD a hh:mm")}</div>
+                    </div>
                 </div>
-                {#if answer.user && $username === answer.user.username }
-                    <a use:link href="/answer-modify/{answer.id}" class="btn btn-sm btn-outline-secondary position-absolute" style="top: 10px; right: 10px;">수정</a>
-                    <button class="btn btn-sm btn-outline-secondary" on:click={() => delete_answer(answer.id) }>삭제</button>
-                {/if}
             </div>
-        </div>
-    {/each}
-    
+        {/each}
     </div>    
             
     <!-- 답변 등록 -->
