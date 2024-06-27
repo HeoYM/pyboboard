@@ -1,30 +1,32 @@
 <script>
     import fastapi from "../lib/api"
     import { link } from "svelte-spa-router"
-    import { page, is_login } from "../lib/store"
+    import { page, keyword, is_login } from "../lib/store"
     import moment from 'moment/min/moment-with-locales'
     moment.locale('ko')
     
     let question_list = []
     let size = 10;
     let total = 0;
+    let kw = ''
     // svelte구문 $사용하면 종속된 변수가 변할때마다 total_page 갱신
     $: total_page = Math.ceil(total/size);
 
 
-    function get_question_list(_page) {
+    function get_question_list() {
         let params = {
-            page : _page,
-            size : size,
+            page: $page,
+            size: size,
+            keyword: $keyword,
         }
-        fastapi("get", "/api/question/list", params, (json) => {
-            question_list = json.question_list,
-            $page = _page,
+        fastapi('get', '/api/question/list', params, (json) => {
+            question_list = json.question_list
             total = json.total
-        });
+            kw = $keyword
+        })
     }
 
-    $: get_question_list($page);
+    $:$page, $keyword, get_question_list()
 </script>
 
     <style>
@@ -37,7 +39,19 @@
     </style>
 
 <div class="container my-3 ">
-    <a use:link href="/question-create" class="btn btn-primary mb-2  {$is_login ? '' : 'disabled'}">질문 등록하기</a>
+    <div class="row my-3">
+        <div class="col-6">
+            <a use:link href="/question-create" class="btn btn-primary mb-2  {$is_login ? '' : 'disabled'}">질문 등록하기</a>
+        </div>
+        <div class="col-6">
+            <div class="input-group">
+                <input type="text" class="form-control" bind:value="{kw}">
+                <button class="btn btn-outline-secondary" on:click={() => {$keyword = kw, $page = 0}}>찾기</button>
+            </div>
+        </div>
+    </div>
+
+    
     
     <table class="table">
         <thead>
@@ -71,7 +85,7 @@
     <ul class="pagination pagination-sm justify-content-center">
         <!-- 이전페이지 -->
         <li class="page-item {$page <= 0 && 'disabled'}">
-            <a class="page-link" href="#" aria-label="Previous" on:click="{() => get_question_list($page-1)}">
+            <a class="page-link" href="#" aria-label="Previous" on:click="{() => $page--}">
                 <span aria-hidden="true">&laquo;</span>
             </a>
         </li>
@@ -80,14 +94,14 @@
     {#if total_page <= 9}
         {#each Array(total_page) as _, loop_page}
             <li class="page-item {loop_page === $page && 'active'}">
-                <a href="#" class="page-link" on:click="{() => get_question_list(loop_page)}">{loop_page + 1}</a>
+                <a href="#" class="page-link" on:click="{() => $page--}">{loop_page + 1}</a>
             </li>
         {/each}
     {:else}
         {#if $page <= 5}
             {#each Array(9) as _, loop_page}
                 <li class="page-item {loop_page === $page && 'active'}">
-                    <a href="#" class="page-link" on:click="{() => get_question_list(loop_page)}">{loop_page + 1}</a>
+                    <a href="#" class="page-link" on:click="{() => $page--}">{loop_page + 1}</a>
                 </li>
             {/each}
             <li class="page-item disabled"><span class="page-link">...</span></li>
@@ -95,13 +109,13 @@
             <li class="page-item disabled"><span class="page-link">...</span></li>
             {#each Array(9) as _, loop_page}
                 <li class="page-item {total_page - 9 + loop_page === $page && 'active'}">
-                    <a href="#" class="page-link" on:click="{() => get_question_list(total_page - 9 + loop_page)}">{total_page - 9 + loop_page + 1}</a>
+                    <a href="#" class="page-link" on:click="{() => $page = total_page - 9 + loop_page}">{total_page - 9 + loop_page + 1}</a>
                 </li>
             {/each}
         {:else}
             {#each Array(9) as _, loop_page}
                 <li class="page-item {$page - 4 + loop_page === $page && 'active'}">
-                    <a href="#" class="page-link" on:click="{() => get_question_list($page - 4 + loop_page)}">{$page - 4 + loop_page + 1}</a>
+                    <a href="#" class="page-link" on:click="{() =>$page = $page - 4 + loop_page}">{$page - 4 + loop_page + 1}</a>
                 </li>
             {/each}
             <li class="page-item disabled"><span class="page-link">...</span></li>
@@ -110,7 +124,7 @@
 
     <!-- 다음페이지 -->
     <li class="page-item {$page >= total_page - 1 && 'disabled'}">
-        <a class="page-link" href="#" aria-label="Next" on:click="{() => get_question_list($page + 1)}">
+        <a class="page-link" href="#" aria-label="Next" on:click="{() => $page++}">
             <span aria-hidden="true">&raquo;</span>
         </a>
     </li>

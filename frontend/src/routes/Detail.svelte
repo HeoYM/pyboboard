@@ -3,14 +3,15 @@
     import Error from "../components/Error.svelte";
     import {  link, push } from 'svelte-spa-router'
     import { is_login, username } from "../lib/store"
+    import { marked } from 'marked'
     import moment from 'moment/min/moment-with-locales'
     moment.locale('ko')
 
     export let params = {};
     let question_id = params.question_id;
-    let question = { answers: [], userlike:[] };
+    let question = { answers:[], userlike:[], content:'' };
     let content = "";
-    let error = { detail: [] };
+    let error = { detail:[] };
 
     function get_question() {
         fastapi("get", "/api/question/detail/" + question_id, {}, (json) => {
@@ -105,7 +106,7 @@
         <h2 class="border-bottom py-2">{question.subject}</h2>
         <div class="card my-3">
             <div class="card-body">
-                <div class="card-text" style="white-space: pre-line;">{question.content}</div>
+                <div class="card-text">{@html marked.parse(question.content)}</div>
                 <div class="d-flex flex-column align-items-end"></div>
             </div>
         
