@@ -8,7 +8,7 @@
 <nav class="navbar navbar-expand-lg navbar-light bg-light border-bottom">
     <div class="container-fluid">
         <a use:link class="navbar-brand" href="/" on:click="{() => {$keyword = '', $page = 0}}">HYM</a>
-        <button
+        <button 
             class="navbar-toggler"
             type="button"
             data-bs-toggle="collapse"
